@@ -1,0 +1,6 @@
+#ifndef SENSOREN_CONFIG_H
+#define SENSOREN_CONFIG_H
+
+#define SENSOREN_MAX_DEGREE 3
+
+#endif
