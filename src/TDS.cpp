@@ -2,12 +2,12 @@
 #include "internal/median.h"
 #include "internal/eeprom_utils.h"
 
-static const float TEMP_COEFF  = 0.02f;
-static const int   SCOUNT      = 20;
+static const float TEMP_COEFF   = 0.02f;
+static const int   SCOUNT       = 20;
 static const int   SAMPLE_DELAY = 40;
 
-TDSSensor::TDSSensor(uint8_t pin, int eepromOffset, float vRef, float adcMax)
-    : _pin(pin), _eepromOffset(eepromOffset),
+TDSSensor::TDSSensor(uint8_t pin, float vRef, float adcMax)
+    : _pin(pin), _eepromOffset(eeprom_allocateBlock(EEPROM_BLOCK_SIZE)),
       _vRef(vRef), _adcMax(adcMax),
       _degree(0), _calibrated(false)
 {

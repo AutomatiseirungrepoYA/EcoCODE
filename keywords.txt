@@ -1,5 +1,6 @@
 TDSSensor	KEYWORD1
-LDRSensor	KEYWORD1
+TurbiditySensor	KEYWORD1
+DS18B20Sensor	KEYWORD1
 begin	KEYWORD2
 read	KEYWORD2
 isCalibrated	KEYWORD2
@@ -9,4 +10,7 @@ loadFactoryDefaults	KEYWORD2
 setCoefficients	KEYWORD2
 sampleVoltage	KEYWORD2
 isClear	KEYWORD2
+readVoltage	KEYWORD2
+readNTU	KEYWORD2
+isFound	KEYWORD2
 runCalibration	KEYWORD2

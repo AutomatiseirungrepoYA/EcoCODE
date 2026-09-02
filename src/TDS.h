@@ -5,14 +5,14 @@
 
 class TDSSensor {
 public:
-    // pin          : analog pin the probe connects to (e.g. A5)
-    // eepromOffset : EEPROM start address for this sensor's calibration block.
-    //                TDS needs 19 bytes, so if TDS sits at 0, the next
-    //                calibrated sensor should start at 20 or later.
-    // vRef         : ADC reference voltage. 5.0 for Uno/Nano/Mega, 3.3 for ESP32.
-    // adcMax       : Highest ADC value. 1023.0 for 10-bit, 4095.0 for 12-bit.
+    // pin    : analog pin the probe connects to (e.g. A5)
+    // vRef   : ADC reference voltage. 5.0 for Uno/Nano/Mega, 3.3 for ESP32.
+    // adcMax : Highest ADC value. 1023.0 for 10-bit, 4095.0 for 12-bit.
+    //
+    // EEPROM offset is assigned automatically in construction order (19 bytes
+    // per sensor). Declare all TDSSensor globals in the same order on every
+    // build so addresses stay stable across power cycles.
     TDSSensor(uint8_t pin,
-              int     eepromOffset,
               float   vRef   = 5.0f,
               float   adcMax = 1023.0f);
 

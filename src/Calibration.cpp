@@ -6,6 +6,7 @@
 #define MAX_POINTS   15
 #define MAX_DEGREE   3
 
+
 // Stored in static memory rather than on the stack —
 // 15 floats × 2 arrays = 120 bytes on AVR's limited SRAM.
 static float vBuf[MAX_POINTS];
@@ -69,7 +70,6 @@ static int readIntInRange(int lo, int hi) {
 }
 
 // ── Main procedure ────────────────────────────────────────────
-
 bool runCalibration(TDSSensor &sensor) {
     flushSerial();
 

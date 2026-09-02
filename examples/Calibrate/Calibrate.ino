@@ -14,7 +14,7 @@
 
 #include <Sensoren.h>
 
-TDSSensor tds(A5, 0);
+TDSSensor tds(A5);
 
 void setup() {
   Serial.begin(9600);

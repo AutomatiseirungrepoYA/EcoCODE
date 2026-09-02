@@ -1,6 +1,14 @@
 #include "eeprom_utils.h"
 #include <EEPROM.h>
 
+static int _nextEepromOffset = 0;
+
+int eeprom_allocateBlock(int size) {
+    int offset = _nextEepromOffset;
+    _nextEepromOffset += size;
+    return offset;
+}
+
 bool eeprom_isValid(int offset) {
     uint16_t magic = 0;
     EEPROM.get(offset, magic);

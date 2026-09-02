@@ -1,37 +1,46 @@
 /*
   BasicRead — Sensoren Library Example
 
-  Reads TDS and LDR sensors and prints to Serial Monitor at 9600 baud.
+  Reads TDS, turbidity, and DS18B20 temperature sensors and prints to
+  Serial Monitor at 9600 baud.
 
   Wiring:
-    TDS probe → A5
-    LDR       → A4
+    TDS probe  → A5
+    Turbidity  → A4
+    DS18B20    → D2 (needs a 4.7k pull-up resistor to VCC)
 
   EEPROM note:
-    Each calibrated sensor needs its own EEPROM region.
-    TDS uses 19 bytes starting at the offset you provide.
-    If you add a second calibrated sensor, start it at offset 20 or later.
+    Each TDSSensor is automatically assigned its own 19-byte EEPROM region
+    in the order it is declared. Declare sensors in the same order on every
+    build so addresses remain stable across power cycles.
 */
 
 #include <Sensoren.h>
 
-// TDSSensor(pin, eepromOffset)
+// TDSSensor(pin)
 // vRef and adcMax default to 5.0 and 1023.0 for Uno/Nano/Mega.
-TDSSensor tds(A5, 0);
+TDSSensor tds(A5);
 
-// LDRSensor(pin, threshold)
+// TurbiditySensor(pin, threshold)
 // threshold: raw ADC value at or above which water is considered clear.
-LDRSensor ldr(A4, 970);
+TurbiditySensor turbidity(A4, 970);
+
+// DS18B20Sensor(pin)
+DS18B20Sensor temp(2);
 
 void setup() {
   Serial.begin(9600);
 
   tds.begin();
-  ldr.begin();
+  turbidity.begin();
+  temp.begin();
 
   if (!tds.isCalibrated()) {
     Serial.println(F("TDS: keine Kalibrierung gefunden."));
     Serial.println(F("Bitte das Calibrate-Beispiel ausfuehren."));
+  }
+  if (!temp.isFound()) {
+    Serial.println(F("DS18B20: kein Sensor gefunden."));
   }
 }
 
@@ -46,8 +55,16 @@ void loop() {
     Serial.println(F(" ppm"));
   }
 
-  Serial.print(F("LDR: "));
-  Serial.println(ldr.isClear() ? F("klar") : F("trueb"));
+  Serial.print(F("Truebung: "));
+  Serial.print(turbidity.isClear() ? F("klar") : F("trueb"));
+  Serial.print(F("  ("));
+  Serial.print(turbidity.readNTU(), 1);
+  Serial.println(F(" NTU)"));
+
+  Serial.print(F("Temperatur: "));
+  Serial.print(temp.read(), 1);
+  Serial.println(F(" C"));
+
   Serial.println();
 
   delay(2000);
