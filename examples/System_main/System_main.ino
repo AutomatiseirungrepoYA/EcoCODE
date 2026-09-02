@@ -2,18 +2,23 @@
   MonitorMenu — Sensoren Library Example
 
   Menu-driven sketch for an Arduino Nano with an SSD1306 I2C OLED display:
-    'c' — Calibration menu: TDS only (pH uses a fixed formula, no calibration).
-    'r' — Run mode: continuously reads TDS, temperature (DS18B20), and pH,
-          and shows all three on the OLED and the Serial Monitor.
+    'c' — Calibration menu: TDS only (pH uses a fixed formula, no calibration;
+          turbidity uses three fixed thresholds, no calibration either).
+    'r' — Run mode: continuously reads TDS, temperature (DS18B20), pH, and
+          turbidity, and shows all four on the OLED and the Serial Monitor.
           Press any key to return to the menu.
 
   Wiring:
     TDS probe    → A0
     pH probe     → A1
+    Turbidity    → A2
     DS18B20      → D2   (needs a 4.7k pull-up resistor between data and VCC)
     OLED (SSD1306) → A4 (SDA), A5 (SCL) — the Nano's fixed hardware I2C pins.
-                   A4/A5 are reserved for I2C here, so TDS and pH use A0/A1
-                   instead of the pins used in the other examples.
+                   A4/A5 are reserved for I2C here, so TDS/pH/turbidity use
+                   A0/A1/A2 instead of the pins used in the other examples.
+
+  Turbidity thresholds below (TURB_*_THRESHOLD) are raw ADC placeholders —
+  tune them against your own probe's readings in air/clear/murky water.
 
   Requires the "SSD1306Ascii" library (Library Manager, by Bill Greiman) —
   a lightweight text-only driver, not the Adafruit_GFX/Adafruit_SSD1306
@@ -34,11 +39,17 @@
 
 #define OLED_I2C_ADDR 0x3C
 
+// Raw ADC placeholders — tune against your own probe's readings.
+#define TURB_FULLY_CLEAR_THRESHOLD     900
+#define TURB_PARTIALLY_CLEAR_THRESHOLD 600
+#define TURB_FULLY_DARK_THRESHOLD      300
+
 SSD1306AsciiWire oled;
 
-TDSSensor      tds(A1);
-PHSensor       ph(A0);
-DS18B20Sensor  temp(A7);
+TDSSensor       tds(A1);
+PHSensor        ph(A0);
+TurbiditySensor turb(A2, TURB_FULLY_CLEAR_THRESHOLD);
+DS18B20Sensor   temp(A7);
 
 // ── Serial helpers ────────────────────────────────────────────────────────────
 
@@ -82,6 +93,13 @@ static void calibrationMenu() {
 
 // ── Run mode ──────────────────────────────────────────────────────────────────
 
+static const __FlashStringHelper* turbidityLabel() {
+  if (turb.isFullyClear())          return F("klar");
+  if (turb.isPartiallyClear())      return F("leicht trueb");
+  if (turb.isFullyDark())           return F("sehr trueb");
+  return F("trueb");
+}
+
 static void runMode() {
   Serial.println(F(""));
   Serial.println(F("--- Messung laeuft. Beliebige Taste = zurueck zum Menue ---"));
@@ -91,11 +109,14 @@ static void runMode() {
     float tempC = temp.read();
     float ppm   = tds.isCalibrated() ? tds.read(tempC) : -1.0f;
     float phVal = ph.read(tempC);
+    const __FlashStringHelper* turbLabel = turbidityLabel();
 
     Serial.print(F("TDS: "));
     if (ppm < 0) Serial.print(F("--")); else Serial.print(ppm, 0);
     Serial.print(F(" ppm  pH: "));
     if (phVal < 0) Serial.print(F("--")); else Serial.print(phVal, 2);
+    Serial.print(F("  Truebung: "));
+    Serial.print(turbLabel);
     Serial.print(F("  T: "));
     if (temp.isFound()) Serial.print(tempC, 1); else Serial.print(F("--"));
     Serial.println(F(" C"));
@@ -109,6 +130,11 @@ static void runMode() {
     if (phVal < 0) oled.print(F("--       ")); else { oled.print(phVal, 2); oled.print(F("       ")); }
 
     oled.setCursor(0, 2);
+    oled.print(F("Trueb:"));
+    oled.print(turbLabel);
+    oled.print(F("           "));
+
+    oled.setCursor(0, 3);
     oled.print(F("Temp: "));
     if (temp.isFound()) { oled.print(tempC, 1); oled.print(F(" C     ")); }
     else oled.print(F("--       "));
@@ -132,6 +158,9 @@ void setup() {
 
   tds.begin();
   ph.begin();
+  turb.begin();
+  turb.setPartiallyClearThreshold(TURB_PARTIALLY_CLEAR_THRESHOLD);
+  turb.setFullyDarkThreshold(TURB_FULLY_DARK_THRESHOLD);
   temp.begin();
 
   if (!tds.isCalibrated()) {

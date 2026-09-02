@@ -1,8 +1,8 @@
 #include "PH.h"
 
 // Fixed calibration: pH = (V - 3.7076) / -0.1666, V = probe voltage.
-#define PH_SLOPE  -0.1666f
-#define PH_OFFSET  3.7076f
+#define PH_SLOPE  -0.1735f
+#define PH_OFFSET  3.8499f
 #define PH_CAL_TEMP_C 25.0f  // reference temperature the fixed curve above was fit at
 
 PHSensor::PHSensor(uint8_t pin, float vRef, float adcMax)

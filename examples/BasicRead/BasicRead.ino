@@ -21,8 +21,9 @@
 // vRef and adcMax default to 5.0 and 1023.0 for Uno/Nano/Mega.
 TDSSensor tds(A5);
 
-// TurbiditySensor(pin, threshold)
-// threshold: raw ADC value at or above which water is considered clear.
+// TurbiditySensor(pin, fullyClearThreshold)
+// Three independent levels, each with its own threshold — tune these three
+// against your own probe's readings.
 TurbiditySensor turbidity(A4, 970);
 
 // DS18B20Sensor(pin)
@@ -33,6 +34,8 @@ void setup() {
 
   tds.begin();
   turbidity.begin();
+  turbidity.setPartiallyClearThreshold(700);
+  turbidity.setFullyDarkThreshold(400);
   temp.begin();
 
   if (!tds.isCalibrated()) {
@@ -56,10 +59,13 @@ void loop() {
   }
 
   Serial.print(F("Truebung: "));
-  Serial.print(turbidity.isClear() ? F("klar") : F("trueb"));
+  if (turbidity.isFullyClear())          Serial.print(F("klar"));
+  else if (turbidity.isPartiallyClear()) Serial.print(F("leicht trueb"));
+  else if (turbidity.isFullyDark())      Serial.print(F("sehr trueb"));
+  else                                    Serial.print(F("trueb"));
   Serial.print(F("  ("));
-  Serial.print(turbidity.readNTU(), 1);
-  Serial.println(F(" NTU)"));
+  Serial.print(turbidity.readVoltage(), 2);
+  Serial.println(F(" V)"));
 
   Serial.print(F("Temperatur: "));
   Serial.print(temp.read(), 1);

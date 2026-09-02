@@ -9,8 +9,15 @@ coeffsAllZero	KEYWORD2
 loadFactoryDefaults	KEYWORD2
 setCoefficients	KEYWORD2
 sampleVoltage	KEYWORD2
-isClear	KEYWORD2
+isFullyClear	KEYWORD2
+isPartiallyClear	KEYWORD2
+isFullyDark	KEYWORD2
+setFullyClearThreshold	KEYWORD2
+getFullyClearThreshold	KEYWORD2
+setPartiallyClearThreshold	KEYWORD2
+getPartiallyClearThreshold	KEYWORD2
+setFullyDarkThreshold	KEYWORD2
+getFullyDarkThreshold	KEYWORD2
 readVoltage	KEYWORD2
-readNTU	KEYWORD2
 isFound	KEYWORD2
 runCalibration	KEYWORD2

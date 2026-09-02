@@ -1,21 +1,11 @@
 // ============ SELECT EXACTLY ONE TEST ============
 #define TEST_PH
-// #define TEST_TDS
-// #define TEST_PUMP
-// #define TEST_ULTRASONIC
-// ===================================================
 
-#if (defined(TEST_PH) + defined(TEST_TDS) + defined(TEST_PUMP) + defined(TEST_ULTRASONIC)) != 1
+
+#if (defined(TEST_PH) + defined(TEST_TDS) + defined(TEST_TURBIDITY) + defined(TEST_PUMP) + defined(TEST_ULTRASONIC)) != 1
 #error "Uncomment exactly ONE TEST_... define above, not zero, not several."
 #endif
 
-
-
-
-
-// ====================================================================
-// ============================ TEST_PH ================================
-// ====================================================================
 #if defined(TEST_PH)
 #include <Sensoren.h>
 
@@ -136,6 +126,35 @@ void loop() {
   }
 }
 #endif // TEST_TDS
+
+
+
+// ====================================================================
+// ======================== TEST_TURBIDITY ==============================
+// ====================================================================
+#if defined(TEST_TURBIDITY)
+#include <Sensoren.h>
+
+// Raw ADC (0-1023) readout only — no thresholds, no classification. Use
+// this to watch the raw value in air, in clear water, and in murky water,
+// then pick your three threshold numbers from what you see here.
+#define TurbiditySensorPin A4
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(TurbiditySensorPin, INPUT);
+  Serial.println(F("Turbidity raw ADC test - no calibration, no thresholds"));
+}
+
+void loop() {
+  int raw = analogRead(TurbiditySensorPin);
+
+  Serial.print(F("Raw ADC: "));
+  Serial.println(raw);
+
+  delay(500);
+}
+#endif // TEST_TURBIDITY
 
 
 
