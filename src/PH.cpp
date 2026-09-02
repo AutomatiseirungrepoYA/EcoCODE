@@ -1,6 +1,6 @@
 #include "PH.h"
 
-// Fixed calibration: pH = -0.1666 * V + 3.7076, V = probe voltage.
+// Fixed calibration: pH = (V - 3.7076) / -0.1666, V = probe voltage.
 #define PH_SLOPE  -0.1666f
 #define PH_OFFSET  3.7076f
 #define PH_CAL_TEMP_C 25.0f  // reference temperature the fixed curve above was fit at
@@ -40,5 +40,5 @@ float PHSensor::read(float tempC) {
 
     // Offset is NOT temperature-compensated — no established compensation
     // model applied here, same known gap as before.
-    return PH_OFFSET + PH_SLOPE * tempFactor * voltage;
+    return (voltage - PH_OFFSET) / (PH_SLOPE * tempFactor);
 }
